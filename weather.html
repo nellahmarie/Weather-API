@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Weather Forecast</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css" integrity="sha512-jLVPha06sE+Qm8sdcimhfykx+hG/0jqzeWZK/kl/6Mvmi/Qnq3BdW+3OMayzSZp0LxTXq3ZrkYcZ9bUdwgKjtw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css">
+	<style>
+		body {
+			background-color: #ECEFF4;
+			font-family: Arial, sans-serif;
+		}
+		h1 {
+			margin-top: 40px;
+			text-align: center;
+			color: #2E3440;
+			font-size: 40px;
+			font-weight: bold;
+			text-shadow: 1px 1px #D8DEE9;
+		}
+		p {
+            display: flex;
+            flex-direction: column;
+			margin-top: 20px;
+			margin-bottom: 10px;
+			color: #2E3440;
+			font-size: 18px;
+			font-weight: bold;
+            
+		}
+		input[type=text] {
+			padding: 10px;
+			margin-top: 10px;
+			margin-bottom: 20px;
+			border: none;
+			border-radius: 5px;
+			box-shadow: 1px 1px #D8DEE9;
+			font-size: 16px;
+			width: 100%;
+			max-width: 500px;
+            text-align: center;
+		}
+		button {
+			display: block;
+			margin: 0 auto;
+			padding: 10px 20px;
+			background-color: #88C0D0;
+			border: none;
+			border-radius: 5px;
+			color: #E5E9F0;
+			font-size: 16px;
+			font-weight: bold;
+			box-shadow: 1px 1px #D8DEE9;
+			cursor: pointer;
+		}
+		button:hover {
+			background-color: #81A1C1;
+			box-shadow: 2px 2px #D8DEE9;
+		}
+		#weather-info {
+			margin-top: 30px;
+			padding: 20px;
+			background-color: #E5E9F0;
+			border-radius: 5px;
+			box-shadow: 2px 2px #D8DEE9;
+            animation: fadeIn 1s ease-out;
+        }
+        #weather-icon {
+            font-size: 100px;
+            color: #2E3440;
+            margin-bottom: 20px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation-name: my-animation;
+            animation-duration: 2s; /* Set duration of the animation */
+            animation-iteration-count: infinite; /* Set the number of times the animation should repeat */
+            animation-direction: alternate; 
+        }
+        
+        .weather-detail {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        }
+        .weather-detail span {
+        font-size: 22px;
+        font-weight: bold;
+        color: #2E3440;
+        }
+        .search-container{
+            text-align: center;
+        }
+        @keyframes my-animation {
+            0% {
+                /* Set initial styles for the icon */
+                transform: translateX(0);
+            }
+            50% {
+                /* Set styles for the icon halfway through the animation */
+                transform: translateX(20px);
+            }
+            100% {
+                /* Set final styles for the icon */
+                transform: translateX(0);
+            }
+        }
+        
+        </style>
+
+</head>
+<body>
+	<h1>Weather Forecast</h1>
+	<div class="search-container">
+		<input type="text" placeholder="Enter city name" id="search-bar">
+		<button onclick="searchWeather()">Search</button>
+	</div>
+	<div id="weather-info"></div>
+    <div class="displayWeather">
+
+    </div>
+
+    <script>
+        function searchWeather() {
+            const searchQuery = document.getElementById('search-bar').value;
+            const api_key = 'd5016c6fa06cf34c709dfd030eab567a';
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${searchQuery}&units=metric&appid=${api_key}`;
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                displayWeather(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    
+        function displayWeather(data) {
+            const weatherIcon = document.createElement('i');
+            weatherIcon.classList.add('wi');
+            if (data.weather[0].main === 'Rain') {
+                weatherIcon.classList.add('wi-rain');
+            } else if (data.weather[0].main === 'Clouds') {
+                weatherIcon.classList.add('wi-cloudy');
+            } else {
+                weatherIcon.classList.add('wi-day-sunny');
+            }
+
+            const weatherIconContainer = document.createElement('div'); // Move this line up
+            weatherIconContainer.appendChild(weatherIcon);
+            weatherIconContainer.id = 'weather-icon';
+
+            weatherIcon.classList.add(`wi-owm-${data.weather[0].id}`);
+            
+            const cityName = document.createElement('p');
+            cityName.innerText = data.name;
+
+            const weatherDescription = document.createElement('p');
+            weatherDescription.innerText = data.weather[0].description;
+
+            const temperature = document.createElement('span');
+            temperature.innerText = `${data.main.temp}°C`;
+            const temperatureDetail = document.createElement('div');
+            temperatureDetail.classList.add('weather-detail');
+            temperatureDetail.appendChild(document.createTextNode('Temperature: '));
+            temperatureDetail.appendChild(temperature);
+
+            const humidity = document.createElement('span');
+            humidity.innerText = `${data.main.humidity}%`;
+            const humidityDetail = document.createElement('div');
+            humidityDetail.classList.add('weather-detail');
+            humidityDetail.appendChild(document.createTextNode('Humidity: '));
+            humidityDetail.appendChild(humidity);
+
+            const windSpeed = document.createElement('span');
+            windSpeed.innerText = `${data.wind.speed} m/s`;
+            const windSpeedDetail = document.createElement('div');
+            windSpeedDetail.classList.add('weather-detail');
+            windSpeedDetail.appendChild(document.createTextNode('Wind Speed: '));
+            windSpeedDetail.appendChild(windSpeed);
+
+            const weatherInfo = document.getElementById('weather-info');
+            weatherInfo.innerHTML = '';
+            weatherInfo.appendChild(weatherIconContainer);
+            weatherInfo.appendChild(cityName);
+            weatherInfo.appendChild(weatherDescription);
+            weatherInfo.appendChild(temperatureDetail);
+            weatherInfo.appendChild(humidityDetail);
+            weatherInfo.appendChild(windSpeedDetail);
+        }
+</script>
+    
